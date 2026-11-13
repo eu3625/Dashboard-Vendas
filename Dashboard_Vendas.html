@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard de Vendas</title>
+<style>
+:root{--bg:#f3f6fb;--card:#fff;--ink:#172033;--muted:#6b7280;--line:#e7ebf2;--navy:#172554;--blue:#4169e1;--teal:#12a594;--orange:#f59e0b;--purple:#8b5cf6;--red:#ef6461}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);font-family:Inter,Segoe UI,Arial,sans-serif;color:var(--ink)}
+header{background:linear-gradient(120deg,#172554,#294b9b);color:#fff;padding:28px max(24px,calc((100% - 1400px)/2));}
+header .top{display:flex;justify-content:space-between;align-items:center;gap:20px;flex-wrap:wrap}
+h1{margin:0;font-size:27px;letter-spacing:-.5px}header p{margin:7px 0 0;color:#dbe5ff;font-size:14px}
+.pill{border:1px solid #ffffff55;background:#ffffff15;padding:8px 12px;border-radius:20px;font-size:12px}
+main{max-width:1400px;margin:24px auto;padding:0 22px 40px}
+.filters{display:flex;gap:12px;align-items:end;flex-wrap:wrap;background:var(--card);padding:16px;border:1px solid var(--line);border-radius:14px;margin-bottom:18px;box-shadow:0 3px 12px #1b2b4b08}
+.field{display:flex;flex-direction:column;gap:6px;min-width:190px}label{font-size:12px;color:var(--muted);font-weight:650}
+select,input{border:1px solid #d9dfeb;border-radius:9px;padding:10px 12px;background:#fff;color:var(--ink);font:inherit;font-size:13px;outline:none}
+button{border:0;border-radius:9px;background:#e9efff;color:#2346a0;padding:10px 15px;font-weight:650;cursor:pointer}button:hover{background:#dce6ff}
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:18px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px;box-shadow:0 3px 12px #1b2b4b08;min-width:0}
+.kpi-label{color:var(--muted);font-size:12px;font-weight:650}.kpi-value{font-size:25px;font-weight:750;letter-spacing:-.6px;margin-top:9px}.kpi-note{font-size:11px;color:var(--muted);margin-top:5px}
+.charts{display:grid;grid-template-columns:1.15fr 1fr 1fr;gap:14px;margin-bottom:18px}
+.card h2{font-size:15px;margin:0 0 4px}.sub{font-size:11px;color:var(--muted);margin-bottom:16px}
+.bar-list{display:flex;flex-direction:column;gap:13px}.bar-row{display:grid;grid-template-columns:105px 1fr auto;gap:9px;align-items:center;font-size:11px}.bar-track{height:10px;background:#edf1f8;border-radius:20px;overflow:hidden}.bar-fill{height:100%;border-radius:20px;background:linear-gradient(90deg,#4169e1,#6c8cff)}.bar-value{font-weight:650;font-variant-numeric:tabular-nums}
+.donut-wrap{display:flex;align-items:center;gap:18px;min-height:175px}.donut{width:145px;height:145px;border-radius:50%;flex:0 0 145px;position:relative}.donut:after{content:"";position:absolute;inset:29px;background:#fff;border-radius:50%}.donut-center{position:absolute;inset:0;z-index:1;display:flex;align-items:center;justify-content:center;flex-direction:column;font-size:11px;color:var(--muted)}.donut-center strong{font-size:18px;color:var(--ink)}
+.legend{display:flex;flex-direction:column;gap:8px;font-size:11px;min-width:0}.legend-item{display:flex;gap:7px;align-items:center;justify-content:space-between}.legend-name{display:flex;align-items:center;gap:6px;min-width:0}.dot{width:9px;height:9px;border-radius:3px;flex:0 0 9px}
+.day-chart{height:165px;display:flex;align-items:end;gap:12px;padding:8px 4px 0;border-bottom:1px solid var(--line)}.day-col{flex:1;display:flex;align-items:center;flex-direction:column;justify-content:end;height:100%;gap:6px}.day-bar{width:min(34px,75%);background:linear-gradient(180deg,#16b8a6,#0e8d86);border-radius:6px 6px 0 0;min-height:3px}.day-val{font-size:10px;color:var(--muted)}.day-label{font-size:10px;color:var(--muted);white-space:nowrap}
+.reports{margin-bottom:18px}.reports ul{margin:12px 0 0;padding-left:19px;display:grid;gap:9px;color:#39445a;font-size:13px;line-height:1.45}
+.table-card{padding:0;overflow:hidden}.table-head{padding:18px 18px 12px;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}.table-wrap{overflow:auto;max-height:520px}table{border-collapse:collapse;width:100%;font-size:12px;white-space:nowrap}th{position:sticky;top:0;background:#f6f8fc;color:#596579;text-align:left;font-size:11px;letter-spacing:.2px;z-index:1}td,th{padding:11px 13px;border-top:1px solid var(--line)}td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}tbody tr:hover{background:#f8faff}.tag{background:#edf3ff;color:#3156b8;padding:4px 7px;border-radius:20px;font-size:10px}.empty{text-align:center;color:var(--muted);padding:28px}
+footer{text-align:center;color:#8992a3;font-size:11px;padding:20px}
+@media(max-width:1000px){.charts{grid-template-columns:1fr 1fr}.charts .card:first-child{grid-column:1/-1}}
+@media(max-width:700px){main{padding:0 12px}.kpis{grid-template-columns:1fr 1fr}.charts{grid-template-columns:1fr}.charts .card:first-child{grid-column:auto}.kpi-value{font-size:21px}.donut-wrap{justify-content:center}}
+</style>
+</head>
+<body>
+<header><div class="top"><div><h1>Dashboard de Vendas</h1><p>Visão geral de desempenho • Pedidos de 17 a 21 de novembro de 2024</p></div><span class="pill">● Painel interativo · Dados da planilha</span></div></header>
+<main>
+<section class="filters">
+ <div class="field"><label for="region">REGIÃO</label><select id="region"><option value="">Todas as regiões</option></select></div>
+ <div class="field"><label for="product">PRODUTO</label><select id="product"><option value="">Todos os produtos</option></select></div>
+ <div class="field"><label for="search">BUSCAR PEDIDO / ESTADO</label><input id="search" placeholder="Ex.: 1001 ou SP"></div>
+ <button id="reset">Limpar filtros</button>
+</section>
+<section class="kpis">
+ <div class="card"><div class="kpi-label">FATURAMENTO TOTAL</div><div class="kpi-value" id="revenue">—</div><div class="kpi-note">Soma dos totais dos pedidos</div></div>
+ <div class="card"><div class="kpi-label">PEDIDOS</div><div class="kpi-value" id="orders">—</div><div class="kpi-note">Pedidos no filtro atual</div></div>
+ <div class="card"><div class="kpi-label">UNIDADES VENDIDAS</div><div class="kpi-value" id="units">—</div><div class="kpi-note">Quantidade total de itens</div></div>
+ <div class="card"><div class="kpi-label">TICKET MÉDIO</div><div class="kpi-value" id="ticket">—</div><div class="kpi-note">Faturamento ÷ pedidos</div></div>
+</section>
+<section class="charts">
+ <div class="card"><h2>Faturamento por região</h2><div class="sub">Participação de cada região no faturamento filtrado</div><div class="bar-list" id="regionChart"></div></div>
+ <div class="card"><h2>Vendas por produto</h2><div class="sub">Distribuição do faturamento por produto</div><div class="donut-wrap"><div class="donut" id="donut"><div class="donut-center"><strong id="donutCount">—</strong>produtos</div></div><div class="legend" id="productLegend"></div></div></div>
+ <div class="card"><h2>Faturamento por dia</h2><div class="sub">Total diário dos pedidos filtrados</div><div class="day-chart" id="dayChart"></div></div>
+</section>
+<section class="card reports"><h2>Relatórios automáticos</h2><div class="sub">Principais observações calculadas conforme os filtros selecionados</div><ul id="reportList"></ul></section>
+<section class="card table-card">
+ <div class="table-head"><div><h2>Detalhamento dos pedidos</h2><div class="sub" style="margin:5px 0 0">Tabela completa com os registros da planilha</div></div><span class="tag" id="tableCount">29 pedidos</span></div>
+ <div class="table-wrap"><table><thead><tr><th>Pedido</th><th>Região</th><th>Estado</th><th>Produto</th><th>Data</th><th class="num">Quantidade</th><th class="num">Valor unitário</th><th class="num">Frete unitário</th><th class="num">Total</th></tr></thead><tbody id="tbody"></tbody></table></div>
+</section>
+<footer>Dashboard de Vendas • Valores em reais (R$) • Total calculado conforme os dados fornecidos</footer>
+</main>
+<script>
+const raw = [[1001, "Região Centro-Oeste", "GO", "iOS", "17/11/2024", 4, 8300, 15], [1002, "Região Sudeste", "SP", "Pen drive 32GB", "17/11/2024", 4, 45, 10], [1003, "Região Sul", "RS", "iOS", "17/11/2024", 2, 8300, 15], [1004, "Região Sul", "RS", "Monitor OLED 33\"", "18/11/2024", 1, 1790, 15], [1005, "Região Sudeste", "SP", "Smart TV 50\" 4K", "18/11/2024", 1, 2950, 10], [1006, "Região Nordeste", "BA", "Smartphone Android", "18/11/2024", 4, 3200, 20], [1007, "Região Sudeste", "SP", "Smart TV 50\" 4K", "18/11/2024", 2, 2950, 10], [1008, "Região Sudeste", "RJ", "TV 48\" 4K", "19/11/2024", 4, 2840, 10], [1009, "Região Nordeste", "BA", "Smart TV 50\" 4K", "19/11/2024", 5, 2950, 20], [1010, "Região Sudeste", "RJ", "Smartphone Android", "19/11/2024", 1, 3200, 10], [1011, "Região Sudeste", "RJ", "TV 60\" 4K", "19/11/2024", 1, 3470, 10], [1012, "Região Centro-Oeste", "GO", "Monitor OLED 33\"", "19/11/2024", 3, 1790, 15], [1013, "Região Sudeste", "MG", "TV 60\" 4K", "20/11/2024", 5, 3470, 10], [1014, "Região Norte", "AM", "Smartphone Android", "20/11/2024", 4, 3200, 25], [1015, "Região Sudeste", "MG", "Pen drive 32GB", "20/11/2024", 5, 45, 10], [1016, "Região Sudeste", "ES", "Monitor OLED 33\"", "20/11/2024", 4, 1790, 10], [1017, "Região Sudeste", "ES", "Pen drive 32GB", "20/11/2024", 1, 45, 10], [1018, "Região Sul", "PR", "iOS", "20/11/2024", 2, 8300, 15], [1019, "Região Sul", "PR", "Monitor OLED 33\"", "20/11/2024", 5, 1790, 15], [1020, "Região Sul", "RS", "iOS", "20/11/2024", 1, 8300, 15], [1021, "Região Sudeste", "SP", "Monitor OLED 33\"", "21/11/2024", 5, 1790, 10], [1022, "Região Sudeste", "SP", "Smartphone Android", "21/11/2024", 1, 3200, 10], [1023, "Região Sul", "RS", "TV 60\" 4K", "21/11/2024", 2, 3470, 15], [1024, "Região Sudeste", "SP", "Monitor OLED 33\"", "21/11/2024", 5, 1790, 10], [1025, "Região Sudeste", "RJ", "Monitor OLED 33\"", "21/11/2024", 5, 1790, 10], [1026, "Região Sudeste", "RJ", "TV 60\" 4K", "21/11/2024", 3, 3470, 10], [1027, "Região Sudeste", "MG", "Monitor OLED 33\"", "21/11/2024", 3, 1790, 10], [1028, "Região Sudeste", "MG", "iOS", "21/11/2024", 1, 8300, 10], [1029, "Região Nordeste", "BA", "Pen drive 32GB", "21/11/2024", 3, 45, 20]];
+const colors = ['#4169e1','#12a594','#f59e0b','#8b5cf6','#ef6461','#0ea5e9','#64748b'];
+const money = n => n.toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
+const number = n => n.toLocaleString('pt-BR');
+const total = r => r[5]*(r[6]+r[7]);
+const regionEl=document.getElementById('region'), productEl=document.getElementById('product');
+[...new Set(raw.map(r=>r[1]))].sort().forEach(v=>regionEl.add(new Option(v,v)));
+[...new Set(raw.map(r=>r[3]))].sort().forEach(v=>productEl.add(new Option(v,v)));
+function render(){
+ const reg=regionEl.value, prod=productEl.value, q=document.getElementById('search').value.trim().toLowerCase();
+ const rows=raw.filter(r=>(!reg||r[1]===reg)&&(!prod||r[3]===prod)&&(!q||String(r[0]).includes(q)||r[2].toLowerCase().includes(q)));
+ const revenue=rows.reduce((s,r)=>s+total(r),0), units=rows.reduce((s,r)=>s+r[5],0);
+ document.getElementById('revenue').textContent=money(revenue);
+ document.getElementById('orders').textContent=number(rows.length);
+ document.getElementById('units').textContent=number(units);
+ document.getElementById('ticket').textContent=money(rows.length?revenue/rows.length:0);
+ document.getElementById('tableCount').textContent=`${rows.length} ${rows.length===1?'pedido':'pedidos'}`;
+ // Region bars
+ const byRegion=group(rows,1); const regionEntries=Object.entries(byRegion).sort((a,b)=>b[1]-a[1]);
+ document.getElementById('regionChart').innerHTML=regionEntries.length?regionEntries.map(([name,val])=>`<div class="bar-row"><span>${name.replace('Região ','')}</span><div class="bar-track"><div class="bar-fill" style="width:${revenue?val/revenue*100:0}%"></div></div><span class="bar-value">${money(val)}</span></div>`).join(''):'<div class="empty">Sem dados para exibir</div>';
+ // Product donut
+ const byProduct=group(rows,3); const pEntries=Object.entries(byProduct).sort((a,b)=>b[1]-a[1]); let cumulative=0;
+ const stops=pEntries.map(([name,val],i)=>{const start=cumulative;cumulative+=revenue?val/revenue*100:0;return `${colors[i%colors.length]} ${start}% ${cumulative}%`});
+ document.getElementById('donut').style.background=pEntries.length?`conic-gradient(${stops.join(',')})`:'#e8edf5';
+ document.getElementById('donutCount').textContent=pEntries.length;
+ document.getElementById('productLegend').innerHTML=pEntries.slice(0,7).map(([name,val],i)=>`<div class="legend-item"><span class="legend-name"><i class="dot" style="background:${colors[i%colors.length]}"></i>${name}</span><b>${revenue?(val/revenue*100).toFixed(1).replace('.',','):'0'}%</b></div>`).join('')||'<span>Sem dados</span>';
+ // Daily chart
+ const byDay=group(rows,4); const days=Object.entries(byDay).sort((a,b)=>dateKey(a[0])-dateKey(b[0])); const max=Math.max(1,...days.map(x=>x[1]));
+ document.getElementById('dayChart').innerHTML=days.map(([d,v])=>`<div class="day-col"><span class="day-val">${moneyShort(v)}</span><div class="day-bar" style="height:${Math.max(3,v/max*112)}px" title="${money(v)}"></div><span class="day-label">${d.slice(0,5)}</span></div>`).join('')||'<div class="empty">Sem dados</div>';
+ // Table
+ document.getElementById('tbody').innerHTML=rows.map(r=>`<tr><td><b>${r[0]}</b></td><td>${r[1]}</td><td>${r[2]}</td><td>${r[3]}</td><td>${r[4]}</td><td class="num">${r[5]}</td><td class="num">${money(r[6])}</td><td class="num">${money(r[7])}</td><td class="num"><b>${money(total(r))}</b></td></tr>`).join('')||'<tr><td colspan="9" class="empty">Nenhum pedido encontrado com esses filtros.</td></tr>';
+ // Reports
+ const reports=[];
+ if(rows.length){
+  const bestRegion=regionEntries[0], bestProduct=pEntries[0], bestDay=days.slice().sort((a,b)=>b[1]-a[1])[0];
+  reports.push(`O faturamento no recorte atual é de <b>${money(revenue)}</b>, distribuído em <b>${rows.length} pedidos</b> e <b>${units} unidades</b>.`);
+  if(bestRegion)reports.push(`A região com maior faturamento é <b>${bestRegion[0]}</b>, com <b>${money(bestRegion[1])}</b> (${(bestRegion[1]/revenue*100).toFixed(1).replace('.',',')}% do total).`);
+  if(bestProduct)reports.push(`O produto líder em faturamento é <b>${bestProduct[0]}</b>, responsável por <b>${money(bestProduct[1])}</b>.`);
+  if(bestDay)reports.push(`O dia de maior faturamento foi <b>${bestDay[0]}</b>, com <b>${money(bestDay[1])}</b>.`);
+  const avg=units/rows.length;reports.push(`A média foi de <b>${avg.toFixed(1).replace('.',',')} unidades por pedido</b> e o ticket médio ficou em <b>${money(revenue/rows.length)}</b>.`);
+ }else reports.push('Não há pedidos para os filtros selecionados. Ajuste ou limpe os filtros para visualizar os relatórios.');
+ document.getElementById('reportList').innerHTML=reports.map(x=>`<li>${x}</li>`).join('');
+}
+function group(rows,index){return rows.reduce((a,r)=>(a[r[index]]=(a[r[index]]||0)+total(r),a),{})}
+function dateKey(s){const [d,m,y]=s.split('/');return new Date(+y,+m-1,+d).getTime()}
+function moneyShort(n){return n>=1000?'R$'+(n/1000).toFixed(1).replace('.',',')+' mil':'R$'+Math.round(n)}
+[regionEl,productEl,document.getElementById('search')].forEach(el=>el.addEventListener('input',render));
+document.getElementById('reset').addEventListener('click',()=>{regionEl.value='';productEl.value='';document.getElementById('search').value='';render()});
+render();
+</script>
+</body></html>
